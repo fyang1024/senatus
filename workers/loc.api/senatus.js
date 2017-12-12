@@ -48,6 +48,8 @@ class Senatus extends Api {
         whitelist.set(user.username, user)
       })
 
+      if (!verifySigs(payload, sig, whitelist)) return cb(new Error('Signatures are not matched'))
+
       if (!payload.uuid) {
         payload.uuid = uuid.v4()
       }
@@ -61,8 +63,6 @@ class Senatus extends Api {
       if (payload.sigs.length === payload.sigsRequired) {
         payload.completed = true
       }
-
-      if (!verifySigs(payload, whitelist)) return cb(new Error('Signatures are not matched'))
 
       const opts = {seq: payload.sigs.length, salt: payload.uuid}
       wasteland.put(payload, opts, function (err, res) {
@@ -111,7 +111,7 @@ class Senatus extends Api {
     return errors
   }
 
-  _verifySigs (payload, whitelist) {
+  _verifySigs (payload, sig, whitelist) {
     return false
   }
 
